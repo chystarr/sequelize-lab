@@ -6,8 +6,9 @@ const { Genre, Movie, Actor } = require("./models");
   - add one more Genre of your choice
   - duplicate entries are not allowed (try it to learn about errors)
 */
-function insertNewGenre() {
-  // Add code here
+async function insertNewGenre() {
+  const newGenre = Genre.build({name: "Horror"});
+  await newGenre.save();
 }
 
 /*
@@ -16,36 +17,56 @@ function insertNewGenre() {
   - add one more Movie of your choice.
   - the movie CANNOT be from year 2008 (try it to learn about errors)
 */
-function insertNewMovie() {
-  // Add code here
+async function insertNewMovie() {
+  // const newMovie = Movie.build({title: "Movie Title", year: 2013, genreId: 2});
+  // await newMovie.save();
+  // From the documentation: "Sequelize provides the create method, which combines
+  // the build and save methods shown above into a single method"
+  const newMovie = await Movie.create({title: "Movie Title", year: 2013, genreId: 2});
 }
 
 /*
   Write a function that returns the title of the movie with ID=2
 */
 function getMovieWithId2() {
-  // Add code here
+  // let movie2 = await Movie.findByPk(2);
+  // return movie2.year;
+  return Movie.findOne({ where: {id: 2} }).then(movie2 => {
+    return movie2.title;
+  })
 }
 
 /*
   Write a function that returns an array of all the actor names
 */
-function getAllActors() {
-  // Add code here
+async function getAllActors() {
+ const actorObjects = await Actor.findAll();
+ return actorObjects.map(actorObject => {
+  return actorObject.name;
+ })
 }
 
 /*
   Write a function that returns an array of all the movie titles from 2008
 */
-function getAllMoviesFrom2008() {
-  // Add code here
+async function getAllMoviesFrom2008() {
+
+  const movieObjects = await Movie.findAll({
+    where: {
+      year: 2008
+    }
+  });
+  return movieObjects.map(movieObject => {
+    return movieObject.title;
+  })
 }
 
 /*
   Write a function that deletes the genre you added in the first function: insertNewGenre()
 */
-function deleteGenreYouAdded() {
-  // Add code here
+async function deleteGenreYouAdded() {
+  const genreToDelete = await Genre.findOne({ where: {name: "Horror"} });
+  await genreToDelete.destroy();
 }
 
 /*
@@ -54,8 +75,10 @@ function deleteGenreYouAdded() {
   - the actor and movie record already exist in the database
   - add the association record to the database
 */
-function associateRosarioToEagleEye() {
-  // Add code here
+async function associateRosarioToEagleEye() {
+  const rosario = await Actor.findOne({ where: {name: 'Rosario Dawson'} });
+  const eagleEye = await Movie.findOne({ where: {title: 'Eagle Eye'} });
+  rosario.addMovie(eagleEye);
 }
 
 /*
@@ -65,7 +88,9 @@ function associateRosarioToEagleEye() {
   - add the association record to the database
 */
 async function associateRobertToTropicThunder() {
-  // Add code here
+  const rdj = await Actor.findOne({ where: {name: 'Robert Downey Jr.'} });
+  const tropicThunder = await Movie.findOne({ where: {title: 'Tropic Thunder'} });
+  rdj.addMovie(tropicThunder);
 }
 
 module.exports = {
